@@ -6,33 +6,51 @@
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>SandiUI</title>
     <link rel="icon" href="../assets/sand.png" />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@shoelace-style/shoelace@2.15.1/cdn/themes/light.css" />
+    <script type="module" src="https://cdn.jsdelivr.net/npm/@shoelace-style/shoelace@2.15.1/cdn/shoelace.js"></script>
     <style>
       :root { --unit: 8px; }
-      body { margin: 0; font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial; background: #f8fafc; }
+      body { margin: 0; font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial; background: radial-gradient(1200px 600px at 10% -10%, #e6f1ff 0%, transparent 90%), radial-gradient(1200px 700px at 110% 10%, #eef6ff 0%, transparent 55%), #f7fbff; }
       .container { max-width: 1100px; margin: 0 auto; padding: 8px; }
-      .box { background: #fff; border: 1px solid #e2e8f0; border-radius: 0; padding: 4px 4px 2px; }
-      .logo { height: 60px; width: 120px; object-fit: contain; display: block; margin: 0 auto 4px; }
+      .box {  padding: 4px 4px 2px; }
+      .logo { height: 60px; width: 120px; object-fit: contain; display: block; }
+      .logos { display:flex; gap:8px; align-items:center; justify-content:center; margin: 0 auto 4px; }
       .row { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 4px; align-items: stretch; }
       .half { flex: 0 0 calc(50% - 4px); width: calc(50% - 4px); display: flex; box-sizing: border-box; }
       .half-left { padding-right: 4px; }
       .half-right { padding-left: 4px; }
-      @media (max-width: 520px) {
+      @media (max-width: 680px) {
         .half { flex: 0 0 100%; width: 100%; padding: 0; }
       }
-      .section { background: #f9fafb; border: 1px solid #e2e8f0; border-radius: 6px; padding: 8px; display: flex; flex-direction: column; height: 100%; }
+      .section { background: #fff; border: 0; border-radius: 12px; padding: 8px; display: flex; flex-direction: column; height: 100%; box-shadow: 0 10px 28px rgba(2, 6, 23, 0.06), 0 2px 6px rgba(2, 6, 23, 0.03); }
       .split-row { display:flex; gap:8px; flex-wrap:wrap; align-items:stretch; }
       .split-col { flex: 0 0 calc(50% - 4px); width: calc(50% - 4px); display:flex; box-sizing:border-box; }
-      @media (max-width: 520px) {
+      .split-col-left { flex: 0 0 calc(40% - 4px); width: calc(40% - 4px); }
+      .split-col-right { flex: 0 0 calc(60% - 4px); width: calc(60% - 4px); }
+      @media (max-width: 680px) {
         .split-col { flex: 0 0 100%; width: 100%; }
       }
-      .subsection { background:#fff; border:1px solid #e2e8f0; border-radius:6px; padding:8px; display:flex; flex-direction:column; flex:1; }
+      .subsection { background:#ffffff; border:0; border-radius:10px; padding:8px; display:flex; flex-direction:column; flex:1; box-shadow: 0 8px 22px rgba(2, 6, 23, 0.06), 0 1px 3px rgba(2, 6, 23, 0.04); }
       h3 { margin: 0 0 6px; font-size: 18px; color: #1e293b; }
-      .btn { display: inline-flex; align-items: center; justify-content: center; gap: 8px; background: #2563eb; color: #fff; border: 0; padding: 10px 14px; border-radius: 8px; cursor: pointer; font-size: 16px; }
+      .btn { display: inline-flex; align-items: center; justify-content: center; gap: 8px; background: #2563eb; color: #fff; border: 0; padding: 8px 14px; border-radius: 8px; cursor: pointer; font-size: 15px; }
       .btn:disabled { opacity: 0.6; cursor: default; }
       .btn-secondary { background: #28a745; }
+      .btn-lg { padding: 12px 18px; font-size: 18px; border-radius: 10px; }
+      .icon { width: 16px; height: 16px; display:inline-block; }
+      .tick { display:none; color:#ffffff; font-size: 16px; line-height: 1; }
+      sl-radio-button[checked] .tick { display:inline-block; }
+      .color-swatch { width: 100%; height: 100%; border-radius: inherit; position: relative; display:flex; align-items:center; justify-content:center; }
+      /* Make color radio buttons show pure color without Shoelace's default segment fill */
+      sl-radio-button.color-fill::part(button) { background: transparent !important; padding: 0 !important; box-shadow: none !important; width: 100%; height: 100%; border: 0; min-height: 0; }
+      sl-radio-button.color-fill::part(label) { width: 100%; height: 100%; padding: 0 !important; margin: 0 !important; display: flex; align-items: center; justify-content: center; }
+      sl-radio-button.color-fill::part(checked-icon) { display: none; }
+      sl-radio-button.color-fill[checked]::part(button) { background: transparent !important; box-shadow: none !important; }
+      sl-radio-button.color-fill::part(base) { background: transparent !important; border: 0 !important; border-radius: 8px; overflow: hidden; }
+      /* Remove group background so capsules show individually */
+      #colorChips::part(base) { background: transparent !important; border: 0 !important; padding: 0 !important; }
       label { display: block; color: #334155; font-weight: 600; margin: 6px 0 4px; }
       input[type="text"], select { width: 100%; padding: 8px 10px; border: 1px solid #cbd5e1; border-radius: 6px; }
-      .control { min-height: calc(var(--unit) * 2.6); padding: calc(var(--unit) * 0.6) 14px; }
+      .control { min-height: calc(var(--unit) * 2.6); padding: calc(var(--unit) * 0.8) 14px; }
       .muted { color: #64748b; font-size: 12px; }
       .fileName { color: #334155; font-size: 16px; font-weight: 600; }
       .fileRow { display: flex; align-items: center; gap: 8px; }
@@ -45,16 +63,28 @@
       .checkbox-row { display:flex; gap:10px; align-items:center; flex-wrap:wrap; }
       .inline-row { display:flex; gap:8px; align-items:center; flex-wrap:wrap; }
       .hidden-inline { visibility: hidden; pointer-events: none; }
+    
+
+      #manualHeight::part(base) { padding: 0 10px; height: 34px; border-radius: 6px; }
+      #manualHeight::part(input) { padding: 0 6px; box-sizing: border-box; }
+      @media (max-width: 680px) {
+        #createWrapper { flex: 0 0 100%; width: 100%; margin-left: 0 !important; }
+        #createBtn { width: 100%; }
+        #heightRow { flex-wrap: wrap !important; column-gap: 8px !important; row-gap: 6px !important; }
+        }
     </style>
   </head>
   <body>
     <div class="container">
       <div class="box">
-        <img class="logo" src="../assets/icon1.png" alt="logo" />
+        <div class="logos">
+          <img class="logo" src="../assets/icon1.png" alt="logo" />
+          <img class="logo" src="../assets/sand.png" alt="sand" />
+        </div>
 
         <div class="section" style="margin-top:4px">
           <div class="split-row">
-            <div class="split-col">
+            <div class="split-col split-col-left">
               <div class="subsection">
                 <h3>1. CAD-Source</h3>
                 <div class="inline-row">
@@ -64,24 +94,30 @@
                 <div class="inline-row" style="margin-top:2px">
                   <span class="muted" id="filePath"></span>
                 </div>
-                <button id="pickFile" class="btn control" type="button" style="margin-top:10px">Select STEP File</button>
+                <div style="display:flex; justify-content:center; margin-top:auto;">
+                  <sl-button id="pickFile" variant="primary" size="medium" style="margin-top:10px; width:auto;">Select STEP File</sl-button>
+                </div>
               </div>
             </div>
-            <div class="split-col">
+            <div class="split-col split-col-right">
               <div class="subsection">
                 <h3>2. Settings</h3>
-                <div class="inline-row">
-                  <strong>Rail Height (mm):</strong>
-                  <div class="checkbox-row" id="heightRow">
-                    <label><input type="checkbox" name="h" value="1100" /> 1100</label>
-                    <label><input type="checkbox" name="h" value="1200" /> 1200</label>
-                    <label><input type="checkbox" name="h" value="1500" /> 1500</label>
-                  <label><input type="checkbox" name="h" value="manual" checked /> Manual</label>
-                  <input id="manualHeight" class="control" type="text" placeholder="mm" value="1550" style="width:120px; text-align:center" />
-                  </div>
+                <div class="inline-row" style="align-items:center;">
+                  <strong style="margin-right:8px;">Rail Height (mm):</strong>
+                  <sl-radio-group id="heightRow" value="manual" style="display:flex; gap:8px; align-items:center; flex-wrap:wrap; margin:0;">
+                    <sl-radio-button value="1100" size="small">1100</sl-radio-button>
+                    <sl-radio-button value="1200" size="small">1200</sl-radio-button>
+                    <sl-radio-button value="1500" size="small">1500</sl-radio-button>
+                    <sl-radio-button value="manual" size="small">Manual</sl-radio-button>
+
+                    <div id="manualWrapper" style="display:none; align-items:center; justify-content:center; width:100px;">
+                      <sl-input id="manualHeight" size="small" type="text" inputmode="numeric" placeholder="mm" value="1550" style="width:70px; text-align:center" pattern="[0-9]*"></sl-input>
+                    </div>
+                  </sl-radio-group>
+                  
                 </div>
 
-                <div class="inline-row">
+                <div class="inline-row" style="margin-top:10px;">
                   <strong>Reference Color-Band:</strong>
                   <div class="chips" id="colorChips">
                     <div class="chip selected" data-color="black" title="Black" style="background:#1e293b"><span class="tick">✓</span></div>
@@ -97,16 +133,19 @@
         <div class="section" style="margin-top:4px">
           <div style="display:flex; gap:8px; align-items:center; flex-wrap:wrap;">
             <strong>Program Output Folder:</strong>
-            <button id="pickFolder" class="btn btn-secondary control" type="button">Select Folder</button>
+            <sl-button id="pickFolder" variant="success" size="medium">Select Folder</sl-button>
             <div id="folderInfo" class="muted" style="flex:1">No folder selected</div>
+            <div id="createWrapper" style="margin-left:auto;">
+              <sl-button id="createBtn" variant="primary" size="large">
+                <span>Create</span>
+                <svg class="icon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+                  <path d="M5 12h14M13 5l7 7-7 7" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                </svg>
+              </sl-button>
+            </div>
           </div>
         </div>
 
-        
-
-        <div style="margin-top:6px;">
-          <button id="createBtn" class="btn control" type="button" style="width:100%">Create</button>
-        </div>
       </div>
     </div>
 
@@ -115,29 +154,24 @@
       const filePathEl = document.getElementById('filePath');
       const folderInfo = document.getElementById('folderInfo');
       const heightRow = document.getElementById('heightRow');
+      const manualWrapper = document.getElementById('manualWrapper');
       const manualHeight = document.getElementById('manualHeight');
       const colorChips = document.getElementById('colorChips');
       let selectedHeight = 'manual';
       let selectedColor = 'black';
 
-      heightRow.addEventListener('change', (e) => {
-        if (e.target && e.target.name === 'h') {
-          // Uncheck others
-          heightRow.querySelectorAll('input[name="h"]').forEach(el => el.checked = false);
-          e.target.checked = true;
-          selectedHeight = e.target.value;
-          const wasHidden = manualHeight.classList.contains('hidden-inline');
-          if (selectedHeight === 'manual') {
-            manualHeight.disabled = false;
-            manualHeight.classList.remove('hidden-inline');
-          } else {
-            manualHeight.disabled = true;
-            manualHeight.classList.add('hidden-inline');
-          }
+      heightRow.addEventListener('sl-change', (e) => {
+        selectedHeight = heightRow.value;
+        if (selectedHeight === 'manual') {
+          manualWrapper.style.display = 'flex';
+          manualHeight.disabled = false;
+        } else {
+          manualWrapper.style.display = 'none';
+          manualHeight.disabled = true;
         }
       });
+      manualWrapper.style.display = 'flex';
       manualHeight.disabled = false;
-      manualHeight.classList.remove('hidden-inline');
 
       let lastFile = null;
       let lastFolder = null;

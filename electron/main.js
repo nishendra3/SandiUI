@@ -31,8 +31,8 @@ function getReactiveBuffer(_contentHeight) {
 
 function createWindow() {
   mainWindow = new BrowserWindow({
-    width: 1000,
-    height: 700,
+    width: 720,
+    height: 560,
     minWidth: 480,
     minHeight: 360,
     useContentSize: true,
