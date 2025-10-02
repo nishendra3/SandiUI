@@ -1,14 +1,16 @@
 import React from 'react';
-import { View, Text, TextInput, TouchableOpacity, StyleSheet } from 'react-native';
+import { View, Text, TextInput, StyleSheet, useWindowDimensions, TouchableOpacity } from 'react-native';
 import { Checkbox } from "react-native-paper";
 import { MaterialIcons } from "@expo/vector-icons";
+
+const clamp = (val, min, max) => Math.min(Math.max(val, min), max);
 
 const SettingsSection = ({
   manualHeight,
   setManualHeight,
-  submitManualHeight, // <-- NEW: submit handler for Enter button
+  submitManualHeight,
   selectedColors,
-  setSelectedColors, // <-- NEW: will be used to only allow one color
+  setSelectedColors,
   selectedHeight,
   handleHeightSelection
 }) => {
@@ -22,76 +24,78 @@ const SettingsSection = ({
   };
 
   const handleColorSelect = (color) => {
-    const newSelection = {
-      red: false,
-      blue: false,
-      black: false,
-      [color]: true,
-    };
+    const newSelection = { red: false, blue: false, black: false, [color]: true };
     setSelectedColors(newSelection);
   };
 
-  return (
-    <View style={styles.section}>
-      <Text style={styles.heading}>2. Settings</Text>
+  const { width } = useWindowDimensions();
+  const unit = clamp(Math.round(width * 0.01), 2, 16);
+  const controlHeight = Math.max(32, Math.round(unit * 2.2));
+  const isTight = width < 560;
 
-      {/* Height Options */}
-      <Text style={styles.label}>Rail Height (mm)</Text>
-      <View style={styles.checkboxRow}>
-        {["1100", "1200", "1500"].map((val) => (
-          <View key={val} style={styles.checkboxItem}>
+  return (
+    <View style={[styles.section, { padding: unit }]}>
+      <Text style={[styles.heading, { marginBottom: Math.round(unit * 0.8) }]}>2. Settings</Text>
+
+      {/* Rail Height inline row */}
+      <View style={[styles.inlineRow, { columnGap: Math.round(unit * 0.6), rowGap: Math.round(unit * 0.6), marginBottom: unit }]}>
+        <Text style={styles.labelInline}>Rail Height (mm):</Text>
+        <View style={[styles.inlineWrap, { columnGap: Math.round(unit * 0.6), rowGap: Math.round(unit * 0.4) }]}>
+          {["1100", "1200", "1500"].map((val) => (
+            <View key={val} style={styles.checkboxItem}>
+              <Checkbox
+                status={selectedHeight === val ? "checked" : "unchecked"}
+                onPress={() => handleHeightSelection(val)}
+                color="#007BFF"
+              />
+              <Text>{val}</Text>
+            </View>
+          ))}
+          <View style={styles.checkboxItem}>
             <Checkbox
-              status={selectedHeight === val ? "checked" : "unchecked"}
-              onPress={() => handleHeightSelection(val)}
+              status={selectedHeight === "manual" ? "checked" : "unchecked"}
+              onPress={() => handleHeightSelection("manual")}
               color="#007BFF"
             />
-            <Text>{val}</Text>
+            <Text>Manual</Text>
           </View>
-        ))}
-        <View style={styles.checkboxItem}>
-          <Checkbox
-            status={selectedHeight === "manual" ? "checked" : "unchecked"}
-            onPress={() => handleHeightSelection("manual")}
-            color="#007BFF"
-          />
-          <Text>Manual</Text>
+          {selectedHeight === 'manual' && (
+            <TextInput
+              style={[
+                styles.input,
+                {
+                  padding: Math.round(unit * 0.5),
+                  minHeight: controlHeight,
+                  minWidth: 64,
+                  width: 120,
+                },
+              ]}
+              value={manualHeight}
+              onChangeText={setManualHeight}
+              placeholder="mm"
+              keyboardType="numeric"
+            />
+          )}
         </View>
       </View>
 
-      {/* Manual Height Input + Button */}
-      {selectedHeight === "manual" && (
-        <View style={styles.manualInputContainer}>
-          <TextInput
-            style={styles.input}
-            value={manualHeight}
-            onChangeText={setManualHeight}
-            placeholder="Enter height manually"
-            keyboardType="numeric"
-          />
-          <TouchableOpacity onPress={submitManualHeight} style={styles.enterButton}>
-            <Text style={styles.enterButtonText}>Enter</Text>
-          </TouchableOpacity>
+      {/* Reference Color-Band inline row */}
+      <View style={[styles.inlineRow, { columnGap: Math.round(unit * 0.6), rowGap: Math.round(unit * 0.6), marginTop: Math.round(unit * 0.8) }]}>
+        <Text style={styles.labelInline}>Reference Color-Band:</Text>
+        <View style={[styles.inlineWrap, { columnGap: Math.round(unit * 0.6), rowGap: Math.round(unit * 0.4) }]}>
+          {Object.entries(selectedColors).map(([color, isSelected]) => (
+            <TouchableOpacity
+              key={color}
+              style={[styles.colorChip, isSelected && styles.colorChipSelected, { backgroundColor: getColorValue(color) }]}
+              onPress={() => handleColorSelect(color)}
+              activeOpacity={0.8}
+            >
+              {isSelected && (
+                <MaterialIcons name="check" size={16} color="#ffffff" />
+              )}
+            </TouchableOpacity>
+          ))}
         </View>
-      )}
-
-      {/* Color Selection */}
-      <Text style={styles.label}>Reference Color-Band</Text>
-      <View style={styles.colorOptions}>
-        {Object.entries(selectedColors).map(([color, isSelected]) => (
-          <TouchableOpacity
-            key={color}
-            style={[
-              styles.colorOption,
-              isSelected && styles.colorOptionSelected,
-              { backgroundColor: getColorValue(color) },
-            ]}
-            onPress={() => handleColorSelect(color)}
-          >
-            {isSelected && (
-              <MaterialIcons name="check" size={16} color="white" />
-            )}
-          </TouchableOpacity>
-        ))}
       </View>
     </View>
   );
@@ -100,7 +104,6 @@ const SettingsSection = ({
 const styles = StyleSheet.create({
   section: {
     flex: 1,
-    padding: 20,
     backgroundColor: "#f9fafb",
     borderRadius: 8,
     borderWidth: 1,
@@ -109,67 +112,45 @@ const styles = StyleSheet.create({
   heading: {
     fontSize: 18,
     fontWeight: "600",
-    marginBottom: 16,
     color: "#1e293b",
   },
-  label: {
+  labelInline: {
     fontSize: 14,
-    color: "#475569",
-    marginBottom: 8,
+    color: '#475569',
+    alignSelf: 'center',
   },
-  checkboxRow: {
-    flexDirection: "row",
-    flexWrap: "wrap",
-    alignItems: "center",
-    marginBottom: 16,
-    gap: 12,
+  inlineRow: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    alignItems: 'center',
+  },
+  inlineWrap: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    alignItems: 'center',
   },
   checkboxItem: {
-    flexDirection: "row",
-    alignItems: "center",
-  },
-  manualInputContainer: {
-    flexDirection: "row",
-    alignItems: "center",
-    gap: 8,
-    marginTop: 8,
+    flexDirection: 'row',
+    alignItems: 'center',
   },
   input: {
-    flex: 1,
     borderWidth: 1,
-    padding: 12,
     borderRadius: 6,
-    borderColor: "#cbd5e1",
-    backgroundColor: "#ffffff",
-    fontSize: 14,
+    borderColor: '#cbd5e1',
+    backgroundColor: '#ffffff',
+    textAlign: 'center',
   },
-  enterButton: {
-    backgroundColor: "#007BFF",
-    paddingVertical: 10,
-    paddingHorizontal: 14,
-    borderRadius: 6,
-  },
-  enterButtonText: {
-    color: "white",
-    fontWeight: "600",
-    fontSize: 14,
-  },
-  colorOptions: {
-    flexDirection: "row",
-    gap: 12,
-    marginTop: 8,
-  },
-  colorOption: {
-    width: 32,
-    height: 32,
-    borderRadius: 16,
-    justifyContent: "center",
-    alignItems: "center",
+  colorChip: {
+    width: 28,
+    height: 28,
+    borderRadius: 14,
+    justifyContent: 'center',
+    alignItems: 'center',
     borderWidth: 2,
-    borderColor: "transparent",
+    borderColor: 'transparent',
   },
-  colorOptionSelected: {
-    borderColor: "white",
+  colorChipSelected: {
+    borderColor: '#ffffff',
   },
 });
 

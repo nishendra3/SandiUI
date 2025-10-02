@@ -2,14 +2,15 @@ import React from "react";
 import {
   View,
   Text,
-  TextInput,
   TouchableOpacity,
   StyleSheet,
   Alert,
 } from "react-native";
 import * as DocumentPicker from "expo-document-picker";
 import { MaterialIcons } from "@expo/vector-icons";
-import { Platform } from "react-native";
+import { Platform, useWindowDimensions } from "react-native";
+
+const clamp = (val, min, max) => Math.min(Math.max(val, min), max);
 
 const CADSourceSection = ({
   tmrNumber,
@@ -17,16 +18,11 @@ const CADSourceSection = ({
   selectedCADFile,
   setSelectedCADFile,
 }) => {
-  const handleSubmit = () => {
-    // TODO: Add logic to fetch CAD file based on TMR number
-    
-  };
-
   const openFilePicker = async () => {
     if (Platform.OS === "web") {
       const input = document.createElement("input");
       input.type = "file";
-      input.accept = ".pdf,.txt,.step,.stp"; // You can modify file types here
+      input.accept = ".pdf,.txt,.step,.stp";
       input.onchange = () => {
         const file = input.files[0];
         if (file) {
@@ -47,7 +43,6 @@ const CADSourceSection = ({
           copyToCacheDirectory: true,
           multiple: false,
         });
-
         if (result.type === "success") {
           const fileInfo = {
             name: result.name,
@@ -57,8 +52,6 @@ const CADSourceSection = ({
             type: result.type,
           };
           setSelectedCADFile(fileInfo);
-        } else {
-          console.log("User cancelled file selection");
         }
       } catch (err) {
         console.error("File selection error:", err);
@@ -66,31 +59,34 @@ const CADSourceSection = ({
       }
     }
   };
+
+  const { width } = useWindowDimensions();
+  const unit = clamp(Math.round(width * 0.01), 2, 16);
+  const controlHeight = Math.max(36, Math.round(unit * 2.6));
+
   return (
-    <View style={styles.section}>
-      <Text style={styles.heading}>1. CAD-Source</Text>
+    <View style={[styles.section, { padding: unit, borderRadius: Math.round(unit * 0.6) }]}>
+      <Text style={[styles.heading, { marginBottom: Math.round(unit * 0.8) }]}>1. CAD-Source</Text>
 
-      <Text style={styles.label}>Drawing number (TMR)</Text>
-      <View style={styles.inputRow}>
-        <TextInput
-          style={styles.input}
-          value={tmrNumber}
-          onChangeText={setTmrNumber}
-          placeholder="TMR0001234"
-          placeholderTextColor="#94a3b8"
-        />
-        <TouchableOpacity style={styles.submitButton} onPress={handleSubmit}>
-          <Text style={styles.submitText}>Submit</Text>
-        </TouchableOpacity>
-      </View>
-
-      <Text style={styles.label}>or STEP file manually search</Text>
-      <TouchableOpacity style={styles.fileButton} onPress={openFilePicker}>
-        <MaterialIcons name="attach-file" size={20} color="#007BFF" />
-        <Text style={styles.fileButtonText}>
-          {selectedCADFile
-            ? `Selected: ${selectedCADFile.name}`
-            : "Browse Files"}
+      <Text style={[styles.label, { marginBottom: Math.round(unit * 0.5) }]}>Select STEP/PDF/TXT file</Text>
+      <TouchableOpacity
+        style={[
+          styles.fileButton,
+          {
+            padding: Math.round(unit * 0.6),
+            minHeight: controlHeight,
+            width: "100%",
+            maxWidth: "100%",
+            alignSelf: "stretch",
+            justifyContent: "flex-start",
+            overflow: "hidden",
+          },
+        ]}
+        onPress={openFilePicker}
+      >
+        <MaterialIcons name="attach-file" size={20} color="#007BFF" style={{ marginRight: Math.round(unit * 0.4) }} />
+        <Text style={styles.fileButtonText} numberOfLines={1} ellipsizeMode="middle">
+          {selectedCADFile ? `Selected: ${selectedCADFile.name}` : "Browse Files"}
         </Text>
       </TouchableOpacity>
     </View>
@@ -100,63 +96,34 @@ const CADSourceSection = ({
 const styles = StyleSheet.create({
   section: {
     flex: 1,
-    padding: 20,
     backgroundColor: "#f9fafb",
-    borderRadius: 8,
     borderWidth: 1,
     borderColor: "#e2e8f0",
+    minWidth: 0,
   },
   heading: {
     fontSize: 18,
     fontWeight: "600",
-    marginBottom: 16,
     color: "#1e293b",
   },
   label: {
     fontSize: 14,
     color: "#475569",
-    marginBottom: 8,
-  },
-  inputRow: {
-    flexDirection: "row",
-    alignItems: "center",
-    marginBottom: 16,
-  },
-  input: {
-    flex: 1,
-    borderWidth: 1,
-    padding: 12,
-    borderRadius: 6,
-    borderColor: "#cbd5e1",
-    backgroundColor: "#ffffff",
-    marginRight: 8,
-    fontSize: 14,
-    color: "#1e293b",
-  },
-  submitButton: {
-    paddingVertical: 12,
-    paddingHorizontal: 16,
-    backgroundColor: "#007BFF",
-    borderRadius: 6,
-  },
-  submitText: {
-    color: "#ffffff",
-    fontWeight: "600",
   },
   fileButton: {
     flexDirection: "row",
     alignItems: "center",
-    padding: 12,
     backgroundColor: "#eef2ff",
     borderRadius: 6,
     borderWidth: 1,
     borderColor: "#c7d2fe",
-    gap: 8,
+    minWidth: 0,
   },
   fileButtonText: {
     color: "#007BFF",
     fontWeight: "500",
     flexShrink: 1,
+    minWidth: 0,
   },
 });
 

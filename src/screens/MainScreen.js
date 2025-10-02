@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { View, Image, StyleSheet } from "react-native";
+import { View, Image, StyleSheet, useWindowDimensions, ScrollView } from "react-native";
 import CADSourceSection from "../components/CADSourceSection";
 import SettingsSection from "../components/SettingsSection";
 import FileDisplaySection from "../components/FileDisplaySection";
@@ -25,83 +25,121 @@ const MainScreen = () => {
 
   const submitManualHeight = () => {
     console.log("Manual height submitted:", manualHeight);
-    // Optionally trigger any logic here when Enter is pressed
   };
 
+  const { width, height } = useWindowDimensions();
+  const isNarrow = width < 980;
+  const gutter = Math.max(8, Math.round(width * 0.012));
+
   return (
-    <View style={styles.screenContainer}>
-      <View style={styles.mainBox}>
-        <Image source={require("../../assets/icon1.png")} style={styles.logo} />
+    <ScrollView
+      contentContainerStyle={[styles.screenContainer, { minHeight: height }]}
+      showsVerticalScrollIndicator={false}
+    >
+      <View nativeID="app-content">
+        <View style={styles.mainBox}>
+          <Image source={require("../../assets/icon1.png")} style={styles.logo} />
 
-        <View style={styles.sectionsRow}>
-          <CADSourceSection
-            tmrNumber={tmrNumber}
-            setTmrNumber={setTmrNumber}
-            selectedCADFile={selectedCADFile}
-            setSelectedCADFile={setSelectedCADFile}
+          <View style={styles.sectionsRow}>
+            <View
+              style={[
+                styles.sectionItem,
+                isNarrow ? styles.sectionFull : styles.sectionHalf,
+                isNarrow ? styles.sectionStackSpacing : { paddingRight: Math.floor(gutter / 2) },
+              ]}
+            >
+              <CADSourceSection
+                tmrNumber={tmrNumber}
+                setTmrNumber={setTmrNumber}
+                selectedCADFile={selectedCADFile}
+                setSelectedCADFile={setSelectedCADFile}
+              />
+            </View>
+
+            <View
+              style={[
+                styles.sectionItem,
+                isNarrow ? styles.sectionFull : styles.sectionHalf,
+                isNarrow ? undefined : { paddingLeft: Math.ceil(gutter / 2) },
+              ]}
+            >
+              <SettingsSection
+                manualHeight={manualHeight}
+                setManualHeight={setManualHeight}
+                submitManualHeight={submitManualHeight}
+                selectedColors={selectedColors}
+                setSelectedColors={setSelectedColors}
+                selectedHeight={selectedHeight}
+                handleHeightSelection={handleHeightSelection}
+              />
+            </View>
+          </View>
+
+          <FileDisplaySection selectedCADFile={selectedCADFile} />
+          <FolderDisplaySection
+            outputFolder={outputFolder}
+            setOutputFolder={setOutputFolder}
           />
-
-          <SettingsSection
+          <CreateButton
+            tmrNumber={tmrNumber}
+            selectedCADFile={selectedCADFile}
             manualHeight={manualHeight}
-            setManualHeight={setManualHeight}
-            submitManualHeight={submitManualHeight}
-            selectedColors={selectedColors}
-            setSelectedColors={setSelectedColors}
             selectedHeight={selectedHeight}
-            handleHeightSelection={handleHeightSelection}
+            selectedColors={selectedColors}
+            outputFolder={outputFolder}
           />
         </View>
-
-        <FileDisplaySection selectedCADFile={selectedCADFile} />
-        <FolderDisplaySection
-          outputFolder={outputFolder}
-          setOutputFolder={setOutputFolder}
-        />
-       <CreateButton
-  tmrNumber={tmrNumber}
-  selectedCADFile={selectedCADFile}
-  manualHeight={manualHeight}
-  selectedHeight={selectedHeight}
-  selectedColors={selectedColors}
-  outputFolder={outputFolder}
-/>
-
       </View>
-    </View>
+    </ScrollView>
   );
 };
 
 const styles = StyleSheet.create({
   screenContainer: {
-    flex: 1,
+    flexGrow: 1,
     width: "100%",
-    justifyContent: "center",
-    alignItems: "center",
+    alignItems: "stretch",
+    justifyContent: "flex-start",
     backgroundColor: "#f8fafc",
-    padding: 20,
+    padding: 0,
   },
   mainBox: {
     width: "100%",
-    maxWidth: 950,
     backgroundColor: "#ffffff",
-    padding: 20,
-    borderRadius: 12,
-    shadowColor: "#000",
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 8,
-    elevation: 5,
+    paddingHorizontal: 4,
+    paddingTop: 4,
+    paddingBottom: 2,
+    borderRadius: 0,
+    shadowColor: "transparent",
+    shadowOffset: { width: 0, height: 0 },
+    shadowOpacity: 0,
+    shadowRadius: 0,
+    elevation: 0,
   },
   logo: {
     width: 120,
     height: 60,
     resizeMode: "contain",
-    marginBottom: 20,
+    marginBottom: 4,
+    alignSelf: "center",
   },
   sectionsRow: {
     flexDirection: "row",
-    gap: 20,
-    marginBottom: 20,
+    flexWrap: "wrap",
+    marginBottom: 4,
+    alignItems: "stretch",
+  },
+  sectionItem: {
+    minWidth: 0,
+  },
+  sectionFull: {
+    width: "100%",
+  },
+  sectionHalf: {
+    width: "50%",
+  },
+  sectionStackSpacing: {
+    marginBottom: 8,
   },
 });
 

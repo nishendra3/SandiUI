@@ -1,16 +1,20 @@
 import React from "react";
-import { View, Text, StyleSheet } from "react-native";
+import { View, Text, StyleSheet, useWindowDimensions } from "react-native";
 import { MaterialIcons } from "@expo/vector-icons";
 
+const clamp = (val, min, max) => Math.min(Math.max(val, min), max);
+
 const FileDisplaySection = ({ selectedCADFile }) => {
+  const { width } = useWindowDimensions();
+  const unit = clamp(Math.round(width * 0.01), 2, 16);
   return (
-    <View style={styles.fullSection}>
-      <Text style={styles.heading}>Selected CAD file:</Text>
-      <View style={styles.fileDisplay}>
+    <View style={[styles.fullSection, { padding: unit, marginBottom: Math.round(unit * 0.75) }]}>
+      <Text style={[styles.heading, { marginBottom: Math.round(unit * 0.6) }]}>Selected CAD file:</Text>
+      <View style={[styles.fileDisplay, { columnGap: Math.round(unit * 0.5) }]}>
         <MaterialIcons 
-          name={selectedCADFile ? "insert-drive-file" : "info-outline"} 
-          size={24} 
-          color={selectedCADFile ? "#007BFF" : "#64748b"} 
+          name={selectedCADFile ? "insert-drive-file" : "info-outline"}
+          size={24}
+          color={selectedCADFile ? "#007BFF" : "#64748b"}
         />
         <View style={styles.fileInfo}>
           <Text style={styles.fileText} numberOfLines={1} ellipsizeMode="middle">
@@ -43,24 +47,19 @@ const formatFileSize = (bytes) => {
 const styles = StyleSheet.create({
   fullSection: {
     width: "100%",
-    padding: 20,
     backgroundColor: "#f9fafb",
     borderRadius: 8,
     borderWidth: 1,
     borderColor: "#e2e8f0",
-    marginBottom: 20,
   },
   heading: {
     fontSize: 18,
     fontWeight: "600",
-    marginBottom: 16,
     color: "#1e293b",
   },
   fileDisplay: {
     flexDirection: "row",
     alignItems: "center",
-    marginTop: 8,
-    gap: 12,
   },
   fileInfo: {
     flex: 1,

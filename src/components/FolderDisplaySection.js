@@ -1,7 +1,9 @@
 import React from "react";
-import { View, Text, TouchableOpacity, StyleSheet } from "react-native";
+import { View, Text, TouchableOpacity, StyleSheet, useWindowDimensions } from "react-native";
 import { MaterialIcons } from "@expo/vector-icons";
 import * as DocumentPicker from "expo-document-picker";
+
+const clamp = (val, min, max) => Math.min(Math.max(val, min), max);
 
 const FolderDisplaySection = ({ outputFolder, setOutputFolder }) => {
   const handlePickFolder = async () => {
@@ -23,20 +25,41 @@ const FolderDisplaySection = ({ outputFolder, setOutputFolder }) => {
     }
   };
 
+  const { width } = useWindowDimensions();
+  const unit = clamp(Math.round(width * 0.01), 2, 16);
+  const controlHeight = Math.max(36, Math.round(unit * 2.6));
+
   return (
-    <View style={styles.fullSection}>
-      <Text style={styles.heading}>Program Output Folder:</Text>
-      <View style={styles.fileDisplay}>
+    <View style={[styles.fullSection, { padding: unit, marginBottom: Math.round(unit * 0.75) }]}>
+      {/* Inline label + button */}
+      <View style={[styles.inlineRow, { columnGap: Math.round(unit * 0.6), rowGap: Math.round(unit * 0.6), marginBottom: Math.round(unit * 0.6) }]}>
+        <Text style={styles.headingInline}>Program Output Folder:</Text>
+        <TouchableOpacity
+          style={[
+            styles.folderButton,
+            {
+              paddingHorizontal: unit,
+              paddingVertical: Math.round(unit * 0.6),
+              minHeight: controlHeight,
+              alignItems: "center",
+              justifyContent: "center",
+            },
+          ]}
+          onPress={handlePickFolder}
+        >
+          <Text style={styles.folderButtonText}>Select Folder</Text>
+        </TouchableOpacity>
+      </View>
+
+      {/* Folder display row */}
+      <View style={[styles.fileDisplay, { columnGap: Math.round(unit * 0.5) }]}>
         <MaterialIcons name="folder" size={24} color="#28a745" />
-        <Text style={styles.fileText}>
+        <Text style={styles.fileText} numberOfLines={1} ellipsizeMode="middle">
           {outputFolder
             ? outputFolder.split("/").filter(Boolean).pop()
             : "No folder selected"}
         </Text>
       </View>
-      <TouchableOpacity style={styles.folderButton} onPress={handlePickFolder}>
-        <Text style={styles.folderButtonText}>Select Folder</Text>
-      </TouchableOpacity>
     </View>
   );
 };
@@ -44,35 +67,35 @@ const FolderDisplaySection = ({ outputFolder, setOutputFolder }) => {
 const styles = StyleSheet.create({
   fullSection: {
     width: "100%",
-    padding: 20,
     backgroundColor: "#f9fafb",
     borderRadius: 8,
     borderWidth: 1,
     borderColor: "#e2e8f0",
-    marginBottom: 20,
   },
-  heading: {
+  headingInline: {
     fontSize: 18,
     fontWeight: "600",
-    marginBottom: 16,
     color: "#1e293b",
+    alignSelf: 'center',
+  },
+  inlineRow: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    alignItems: 'center',
   },
   fileDisplay: {
     flexDirection: "row",
     alignItems: "center",
-    marginTop: 8,
-    gap: 8,
   },
   fileText: {
     color: "#334155",
     fontSize: 14,
+    flex: 1,
+    minWidth: 0,
   },
   folderButton: {
-    marginTop: 12,
-    padding: 12,
     backgroundColor: "#28a745",
     borderRadius: 6,
-    alignItems: "center",
   },
   folderButtonText: {
     color: "white",
