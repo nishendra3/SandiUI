@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>SandiUI</title>
+    <link rel="icon" href="../assets/sand.png" />
+    <style>
+      :root { --unit: 8px; }
+      body { margin: 0; font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial; background: #f8fafc; }
+      .container { max-width: 1100px; margin: 0 auto; padding: 8px; }
+      .box { background: #fff; border: 1px solid #e2e8f0; border-radius: 0; padding: 4px 4px 2px; }
+      .logo { height: 60px; width: 120px; object-fit: contain; display: block; margin: 0 auto 4px; }
+      .row { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 4px; align-items: stretch; }
+      .half { flex: 0 0 calc(50% - 4px); width: calc(50% - 4px); display: flex; box-sizing: border-box; }
+      .half-left { padding-right: 4px; }
+      .half-right { padding-left: 4px; }
+      @media (max-width: 520px) {
+        .half { flex: 0 0 100%; width: 100%; padding: 0; }
+      }
+      .section { background: #f9fafb; border: 1px solid #e2e8f0; border-radius: 6px; padding: 8px; display: flex; flex-direction: column; height: 100%; }
+      .split-row { display:flex; gap:8px; flex-wrap:wrap; align-items:stretch; }
+      .split-col { flex: 0 0 calc(50% - 4px); width: calc(50% - 4px); display:flex; box-sizing:border-box; }
+      @media (max-width: 520px) {
+        .split-col { flex: 0 0 100%; width: 100%; }
+      }
+      .subsection { background:#fff; border:1px solid #e2e8f0; border-radius:6px; padding:8px; display:flex; flex-direction:column; flex:1; }
+      h3 { margin: 0 0 6px; font-size: 18px; color: #1e293b; }
+      .btn { display: inline-flex; align-items: center; justify-content: center; gap: 8px; background: #2563eb; color: #fff; border: 0; padding: 10px 14px; border-radius: 8px; cursor: pointer; font-size: 16px; }
+      .btn:disabled { opacity: 0.6; cursor: default; }
+      .btn-secondary { background: #28a745; }
+      label { display: block; color: #334155; font-weight: 600; margin: 6px 0 4px; }
+      input[type="text"], select { width: 100%; padding: 8px 10px; border: 1px solid #cbd5e1; border-radius: 6px; }
+      .control { min-height: calc(var(--unit) * 2.6); padding: calc(var(--unit) * 0.6) 14px; }
+      .muted { color: #64748b; font-size: 12px; }
+      .fileName { color: #334155; font-size: 16px; font-weight: 600; }
+      .fileRow { display: flex; align-items: center; gap: 8px; }
+      .right { display:flex; justify-content:flex-end; }
+      .chips { display:flex; gap:8px; align-items:center; flex-wrap:wrap; }
+      .chip { width:28px; height:28px; border-radius:14px; border:2px solid transparent; display:flex; align-items:center; justify-content:center; cursor:pointer; color:#ffffff; }
+      .chip .tick { display:none; line-height:1; font-size:16px; }
+      .chip.selected { border-color:#ffffff; box-shadow: 0 0 0 2px #cbd5e1 inset; }
+      .chip.selected .tick { display:block; }
+      .checkbox-row { display:flex; gap:10px; align-items:center; flex-wrap:wrap; }
+      .inline-row { display:flex; gap:8px; align-items:center; flex-wrap:wrap; }
+      .hidden-inline { visibility: hidden; pointer-events: none; }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <div class="box">
+        <img class="logo" src="../assets/icon1.png" alt="logo" />
+
+        <div class="section" style="margin-top:4px">
+          <div class="split-row">
+            <div class="split-col">
+              <div class="subsection">
+                <h3>1. CAD-Source</h3>
+                <div class="inline-row">
+                  <strong>Selected CAD file:</strong>
+                  <span class="fileName" id="fileInfo">No CAD file selected</span>
+                </div>
+                <div class="inline-row" style="margin-top:2px">
+                  <span class="muted" id="filePath"></span>
+                </div>
+                <button id="pickFile" class="btn control" type="button" style="margin-top:10px">Select STEP File</button>
+              </div>
+            </div>
+            <div class="split-col">
+              <div class="subsection">
+                <h3>2. Settings</h3>
+                <div class="inline-row">
+                  <strong>Rail Height (mm):</strong>
+                  <div class="checkbox-row" id="heightRow">
+                    <label><input type="checkbox" name="h" value="1100" /> 1100</label>
+                    <label><input type="checkbox" name="h" value="1200" /> 1200</label>
+                    <label><input type="checkbox" name="h" value="1500" /> 1500</label>
+                  <label><input type="checkbox" name="h" value="manual" checked /> Manual</label>
+                  <input id="manualHeight" class="control" type="text" placeholder="mm" value="1550" style="width:120px; text-align:center" />
+                  </div>
+                </div>
+
+                <div class="inline-row">
+                  <strong>Reference Color-Band:</strong>
+                  <div class="chips" id="colorChips">
+                    <div class="chip selected" data-color="black" title="Black" style="background:#1e293b"><span class="tick">✓</span></div>
+                    <div class="chip" data-color="red" title="Red" style="background:#ef4444"><span class="tick">✓</span></div>
+                    <div class="chip" data-color="blue" title="Blue" style="background:#3b82f6"><span class="tick">✓</span></div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="section" style="margin-top:4px">
+          <div style="display:flex; gap:8px; align-items:center; flex-wrap:wrap;">
+            <strong>Program Output Folder:</strong>
+            <button id="pickFolder" class="btn btn-secondary control" type="button">Select Folder</button>
+            <div id="folderInfo" class="muted" style="flex:1">No folder selected</div>
+          </div>
+        </div>
+
+        
+
+        <div style="margin-top:6px;">
+          <button id="createBtn" class="btn control" type="button" style="width:100%">Create</button>
+        </div>
+      </div>
+    </div>
+
+    <script>
+      const fileInfo = document.getElementById('fileInfo');
+      const filePathEl = document.getElementById('filePath');
+      const folderInfo = document.getElementById('folderInfo');
+      const heightRow = document.getElementById('heightRow');
+      const manualHeight = document.getElementById('manualHeight');
+      const colorChips = document.getElementById('colorChips');
+      let selectedHeight = 'manual';
+      let selectedColor = 'black';
+
+      heightRow.addEventListener('change', (e) => {
+        if (e.target && e.target.name === 'h') {
+          // Uncheck others
+          heightRow.querySelectorAll('input[name="h"]').forEach(el => el.checked = false);
+          e.target.checked = true;
+          selectedHeight = e.target.value;
+          const wasHidden = manualHeight.classList.contains('hidden-inline');
+          if (selectedHeight === 'manual') {
+            manualHeight.disabled = false;
+            manualHeight.classList.remove('hidden-inline');
+          } else {
+            manualHeight.disabled = true;
+            manualHeight.classList.add('hidden-inline');
+          }
+        }
+      });
+      manualHeight.disabled = false;
+      manualHeight.classList.remove('hidden-inline');
+
+      let lastFile = null;
+      let lastFolder = null;
+      document.getElementById('pickFile').addEventListener('click', async () => {
+        const file = await window.sandi.pickFile();
+        lastFile = file || null;
+        if (file) {
+          const sizeStr = (file.size != null) ? ` - ${formatBytes(file.size)}` : '';
+          fileInfo.textContent = `${file.name}${sizeStr}`;
+          filePathEl.textContent = file.path || '';
+        } else {
+          fileInfo.textContent = 'No CAD file selected';
+          filePathEl.textContent = '';
+        }
+      });
+
+      document.getElementById('pickFolder').addEventListener('click', async () => {
+        const folder = await window.sandi.pickFolder();
+        lastFolder = folder || null;
+        folderInfo.textContent = folder || 'No folder selected';
+      });
+
+      colorChips.addEventListener('click', (e) => {
+        const chip = e.target.closest('.chip');
+        if (!chip) return;
+        colorChips.querySelectorAll('.chip').forEach(c => c.classList.remove('selected'));
+        chip.classList.add('selected');
+        selectedColor = chip.dataset.color;
+      });
+
+      document.getElementById('createBtn').addEventListener('click', async () => {
+        const payload = {
+          railHeight: selectedHeight === 'manual' ? manualHeight.value : selectedHeight,
+          color: selectedColor,
+          selectedCADFileName: lastFile ? lastFile.name : null,
+          selectedCADFilePath: lastFile ? lastFile.path : null,
+          selectedCADFileSize: lastFile ? lastFile.size : null,
+          outputFolder: lastFolder || null
+        };
+        await window.sandi.submit(payload);
+        alert('Submitted. Check console logs.');
+      });
+
+      function formatBytes(bytes) {
+        if (!bytes) return '0 B';
+        const k = 1024; const sizes = ['B','KB','MB','GB'];
+        const i = Math.floor(Math.log(bytes) / Math.log(k));
+        return `${(bytes / Math.pow(k, i)).toFixed(1)} ${sizes[i]}`;
+      }
+    </script>
+  </body>
+  </html>
+
+

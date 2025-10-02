@@ -2,22 +2,15 @@
   "name": "sandiui",
   "version": "1.0.0",
   "description": "SandiUI - CAD Processing Interface for Sandblasting Operations",
-  "main": "index.js",
+  "main": "electron/main.js",
   "homepage": "./",
   "scripts": {
-    "start": "expo start",
-    "android": "expo start --android",
-    "ios": "expo start --ios",
-    "web": "expo start --web",
-    "electron": "node node_modules/electron/cli.js electron.js",
-    "electron-dev": "set NODE_ENV=development&& set SHOW_DEVTOOLS=0&& node node_modules/electron/cli.js electron.js",
-    "electron-devtools": "set NODE_ENV=development&& set SHOW_DEVTOOLS=1&& node node_modules/electron/cli.js electron.js",
-    "dev": "concurrently \"npm:expo-web\" \"npm:electron-after-web\"",
-    "expo-web": "set EXPO_NONINTERACTIVE=1&& set EXPO_METRO_PORT=8082&& expo start --web --port 19007 --non-interactive",
-    "electron-after-web": "wait-on http://localhost:19007 && set NODE_ENV=development&& node node_modules/electron/cli.js electron.js",
-    "build-web": "expo export --platform web",
-    "build-windows": "npm run build-web && electron-builder --win",
-    "dist": "npm run build-web && electron-builder --publish=never"
+    "start": "node node_modules/electron/cli.js electron/main.js",
+    "electron": "node node_modules/electron/cli.js electron/main.js",
+    "electron-dev": "set NODE_ENV=development&& set SHOW_DEVTOOLS=0&& node node_modules/electron/cli.js electron/main.js",
+    "electron-devtools": "set NODE_ENV=development&& set SHOW_DEVTOOLS=1&& node node_modules/electron/cli.js electron/main.js",
+    "build-windows": "electron-builder --win",
+    "dist": "electron-builder --publish=never"
   },
   "dependencies": {
     "@expo/metro-runtime": "~4.0.1",
@@ -38,6 +31,7 @@
   "devDependencies": {
     "@babel/core": "^7.20.0",
     "concurrently": "^9.2.1",
+    "cross-env": "^10.1.0",
     "electron": "^38.2.0",
     "electron-builder": "^26.0.12",
     "wait-on": "^9.0.1"
@@ -45,9 +39,20 @@
   "build": {
     "appId": "com.sandstrahl.sandiui",
     "productName": "SandiUI",
-    "directories": { "output": "dist" },
-    "files": ["electron.js", "dist/**/*", "assets/**/*", "node_modules/**/*"],
-    "portable": { "artifactName": "SandiUI-${version}-portable.exe" },
+    "directories": {
+      "output": "release"
+    },
+    "files": [
+      "electron/main.js",
+      "preload.js",
+      "renderer/**/*",
+      "assets/**/*",
+      "node_modules/**/*",
+      "package.json"
+    ],
+    "portable": {
+      "artifactName": "SandiUI-${version}-portable.exe"
+    },
     "nsis": {
       "oneClick": false,
       "allowToChangeInstallationDirectory": true,
@@ -58,7 +63,10 @@
     "nodeGypRebuild": false,
     "buildDependenciesFromSource": false,
     "win": {
-      "target": "dir",
+      "target": [
+        "nsis",
+        "portable"
+      ],
       "icon": "assets/sand.ico",
       "signAndEditExecutable": false,
       "signExts": false
